@@ -15,10 +15,10 @@ import group as groups
 tracemalloc.start()
 load_dotenv()
 
-bot = Bot(token=os.getenv('token'))
-# bot = Bot(token=os.getenv('testToken'))
+# bot = Bot(token=os.getenv('token'))
+bot = Bot(token=os.getenv('testToken'))
 dp = Dispatcher(bot)
-db = Database('jack.db')
+db = Database(os.getenv('database'))
 
 
 async def parsing(group):
@@ -84,7 +84,7 @@ async def start(msg: types.Message):
 
 @dp.message_handler(commands=['message'])
 async def message(msg: types.Message):
-    if msg.from_user.id == 729497930:
+    if msg.from_user.id == int(os.getenv('admin')):
         for user in db.all_chats():
             message = msg.text[9:]
             try:
@@ -138,7 +138,7 @@ async def user_text(msg: types.Message):
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
                 group = types.KeyboardButton('Изменить группу 📔')
                 back = types.KeyboardButton('Назад ◀')
-                if msg.from_user.id == 729497930:
+                if msg.from_user.id == int(os.getenv('admin')):
                     if db.get_mailing() == 1:
                         mailing = types.KeyboardButton('Отключить рассылку 📮')
                         markup.add(group, mailing, back)
