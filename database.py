@@ -23,9 +23,14 @@ class Database:
         with self.connection:
             return self.cursor.execute("UPDATE `users` SET `group` = ? WHERE `chat_id` = ?", (group, chat_id,))
 
-    def get_chats(self, group):
+    def len_users_group(self, group):
+        return len(self.cursor.execute("SELECT `chat_id` FROM `users` WHERE `group` = ?", (group,)).fetchall())
+
+    def get_chats(self, group, i):
         with self.connection:
-            return self.cursor.execute("SELECT `chat_id` FROM `users` WHERE `group` = ?", (group, )).fetchone()[0]
+            return self.cursor.execute("SELECT `chat_id` FROM `users` WHERE `group` = ?", (group,)).fetchall()[i]
+
+
 
     def new_schedule(self, schedule, group):
         with self.connection:

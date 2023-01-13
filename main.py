@@ -177,13 +177,18 @@ async def NewSchedule():
 
             try:
                 if db.schedule(group):
-                    chats = db.get_chats(group)
-                    list = db.schedule_print(group)
-                    schedule = re.sub(r'[\[\'\],]', '', list).replace("•", "\n")
-                    try:
-                        await bot.send_message(chats, "На сайте обновили расписание:\n\n" + schedule, parse_mode='html')
-                    except:
-                        pass
+                    len = db.len_users_group(group)
+                    i = 0
+                    while i < len:
+                        chats = str(db.get_chats(group, i))
+                        chat = int(re.sub(r'[(,)]', '', chats))
+                        list = db.schedule_print(group)
+                        schedule = re.sub(r'[\[\'\],]', '', list).replace("•", "\n")
+                        i += 1
+                        try:
+                            await bot.send_message(chat, "На сайте обновили расписание:\n\n" + schedule, parse_mode='html')
+                        except:
+                            pass
             except:
                 pass
 
