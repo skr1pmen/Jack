@@ -1,0 +1,75 @@
+import sqlite3
+
+
+class Database:
+    def __init__(self, db_file):
+        self.connection = sqlite3.connect(db_file)
+        self.cursor = self.connection.cursor()
+
+    def chat_exists(self, chat_id):
+        with self.connection:
+            result = self.cursor.execute("SELECT * FROM `users` WHERE `chat_id` = ?", (chat_id,)).fetchmany(1)
+            return bool(len(result))
+
+    def add_chat(self, chat_id, first_name, prem):
+        with self.connection:
+            return self.cursor.execute("INSERT INTO `users` (`chat_id`, `first_name`, `prem`) VALUES (?,?,?)", (chat_id, first_name, prem,))
+
+    def group_exists(self, chat_id):
+        with self.connection:
+            return self.cursor.execute("SELECT `group` FROM `users` WHERE `chat_id` = ?", (chat_id, )).fetchone()[0]
+
+    def add_group(self, chat_id, group):
+        with self.connection:
+            return self.cursor.execute("UPDATE `users` SET `group` = ? WHERE `chat_id` = ?", (group, chat_id,))
+
+    def get_chats(self, group):
+        with self.connection:
+            return self.cursor.execute("SELECT `chat_id` FROM `users` WHERE `group` = ?", (group, )).fetchone()[0]
+
+    def new_schedule(self, schedule, group):
+        with self.connection:
+            return self.cursor.execute("UPDATE `schedules` SET `new_schedule` = ? WHERE `groups` = ?", (schedule, group, ))
+
+    def record_old_schedule(self, group):
+        with self.connection:
+            schedule = self.cursor.execute("SELECT `new_schedule` FROM `schedules` WHERE `groups` = ?", (group, )).fetchone()[0]
+            self.cursor.execute("UPDATE `schedules` SET `old_schedule` = ? WHERE `groups` = ?", (schedule, group, ))
+
+    def schedule(self, group):
+        with self.connection:
+            new_schedule = self.cursor.execute("SELECT `new_schedule` FROM `schedules` WHERE `groups` = ?", (group, )).fetchone()[0]
+            old_schedule = self.cursor.execute("SELECT `old_schedule` FROM `schedules` WHERE `groups` = ?", (group, )).fetchone()[0]
+
+        if new_schedule == old_schedule:
+            return False
+        else:
+            return True
+
+    def schedule_print(self, group):
+        with self.connection:
+            return self.cursor.execute("SELECT `new_schedule` FROM `schedules` WHERE `groups` = ?", (group, )).fetchone()[0]
+
+    def get_group(self, chat_id):
+        with self.connection:
+            return  self.cursor.execute("SELECT `group` FROM `users` WHERE `chat_id` = ?", (chat_id, )).fetchone()[0]
+
+    def all_chats(self):
+        with self.connection:
+            return self.cursor.execute("SELECT `chat_id`, `first_name` FROM `users`")
+
+    def edit_group(self, chat_id):
+        with self.connection:
+            return self.cursor.execute("UPDATE `users` SET 'group' = 0 WHERE `chat_id` = ?", (chat_id,))
+
+    def get_mailing(self):
+        with self.connection:
+            return self.cursor.execute("SELECT `mailing` FROM `bot_settings`").fetchone()[0]
+
+    def activate_mailing(self):
+        with self.connection:
+            return self.cursor.execute("UPDATE `bot_settings` SET `mailing` = 1")
+
+    def deactivate_mailing(self):
+        with self.connection:
+            return self.cursor.execute("UPDATE `bot_settings` SET `mailing` = 0")
