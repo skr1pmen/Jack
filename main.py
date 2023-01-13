@@ -15,8 +15,8 @@ import group as groups
 tracemalloc.start()
 load_dotenv()
 
-# bot = Bot(token=os.getenv('token'))
-bot = Bot(token=os.getenv('testToken'))
+bot = Bot(token=os.getenv('token'))
+# bot = Bot(token=os.getenv('testToken'))
 dp = Dispatcher(bot)
 db = Database(os.getenv('database'))
 
