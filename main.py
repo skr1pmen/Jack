@@ -36,7 +36,9 @@ async def parsing(group):
         with open("schedule.html", "w", encoding='utf-8') as file:
             file.write(src)
     except:
-        print(f"Код: {group}. Не доступен!")
+        # print(f"Код: {group}. Не доступен!")
+        with open("schedule.html", "w", encoding='utf-8') as file:
+            file.write()
 
     with open("schedule.html", encoding='utf-8') as file:
         src = file.read()
@@ -167,10 +169,10 @@ async def user_text(msg: types.Message):
 
 @dp.message_handler()
 async def NewSchedule():
-    if db.get_mailing() == 1:
+    if bool(db.get_mailing()):
         for group in groups.group.values():
             db.record_old_schedule(group)
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(0.5)
             await parsing(group)
 
             try:
@@ -187,7 +189,7 @@ async def NewSchedule():
 
 
 async def schedule():
-    aioschedule.every(60).seconds.do(NewSchedule)
+    aioschedule.every(15).minutes.do(NewSchedule)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
