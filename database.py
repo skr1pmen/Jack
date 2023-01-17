@@ -30,8 +30,6 @@ class Database:
         with self.connection:
             return self.cursor.execute("SELECT `chat_id` FROM `users` WHERE `group` = ?", (group,)).fetchall()[i]
 
-
-
     def new_schedule(self, schedule, group):
         with self.connection:
             return self.cursor.execute("UPDATE `schedules` SET `new_schedule` = ? WHERE `groups` = ?", (schedule, group, ))
@@ -78,3 +76,16 @@ class Database:
     def deactivate_mailing(self):
         with self.connection:
             return self.cursor.execute("UPDATE `bot_settings` SET `mailing` = 0")
+
+    def if_zero_group(self):
+        with self.connection:
+            user_zero_group = bool(self.cursor.execute("SELECT `chat_id` FROM `users` WHERE `group` = 0").fetchall())
+            return user_zero_group
+
+    def amount_zero_group(self):
+        with self.connection:
+            return len(self.cursor.execute("SELECT `chat_id` FROM `users` WHERE `group` = 0").fetchall())
+
+    def zero_chat_id(self, i):
+        with self.connection:
+            return self.cursor.execute("SELECT `chat_id` FROM `users` WHERE `group` = 0").fetchall()[i]

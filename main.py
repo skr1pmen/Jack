@@ -15,8 +15,8 @@ import group as groups
 tracemalloc.start()
 load_dotenv()
 
-bot = Bot(token=os.getenv('token'))
-# bot = Bot(token=os.getenv('testToken'))
+# bot = Bot(token=os.getenv('token'))
+bot = Bot(token=os.getenv('testToken'))
 dp = Dispatcher(bot)
 db = Database(os.getenv('database'))
 
@@ -162,7 +162,7 @@ async def user_text(msg: types.Message):
             elif msg.text.lower() == "назад ◀":
                 await msg.answer("Возвращаю в меню", parse_mode='html', reply_markup=keyboards())
             else:
-                await msg.answer("Прости, но я тебя не понимаю 😞", parse_mode='html')
+                await msg.answer("Прости, но я тебя не понимаю 😞", parse_mode='html', reply_markup=keyboards())
     except:
         pass
 
@@ -191,6 +191,17 @@ async def NewSchedule():
                             pass
             except:
                 pass
+        if db.if_zero_group():
+            len = db.amount_zero_group()
+            i = 0
+            while i < len:
+                chats = str(db.zero_chat_id(i))
+                chat = int(re.sub(r'[(,)]', '', chats))
+                i += 1
+                await bot.send_message(chat, "Внимание ❗\nТы не получаешься новое расписание от меня, потому что "
+                                             "не указал номер своей группы. Я не экстрасенс, помни об этом ❗",
+                                       parse_mode='html',
+                                       reply_markup=keyboards())
 
 
 async def schedule():
