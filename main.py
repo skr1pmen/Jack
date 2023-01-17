@@ -3,6 +3,7 @@ import os
 import requests
 import re
 import aioschedule
+import random
 from bs4 import BeautifulSoup
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -191,19 +192,23 @@ async def NewSchedule():
                             pass
             except:
                 pass
-        if db.if_zero_group():
-            len = db.amount_zero_group()
-            i = 0
-            while i < len:
-                chats = str(db.zero_chat_id(i))
-                chat = int(re.sub(r'[(,)]', '', chats))
-                i += 1
-                await bot.send_message(chat, "Внимание ❗\nТы не получаешься новое расписание от меня, потому что "
-                                             "не указал номер своей группы. Я не экстрасенс, помни об этом ❗"
-                                             "Если ты хочешь чтобы я отправлял тебе расписание твоей группы, то укажи пожалуйста"
-                                             " её название.\n <i>Пример: МК-22</i>",
-                                       parse_mode='html',
-                                       reply_markup=keyboards())
+        if random.randint(1,10) in 1:
+            try:
+                if db.if_zero_group():
+                    len = db.amount_zero_group()
+                    i = 0
+                    while i < len:
+                        chats = str(db.zero_chat_id(i))
+                        chat = int(re.sub(r'[(,)]', '', chats))
+                        i += 1
+                        await bot.send_message(chat, "Внимание ❗\nТы не получаешься новое расписание от меня, потому что "
+                                                     "не указал номер своей группы. Я не экстрасенс, помни об этом ❗"
+                                                     "Если ты хочешь чтобы я отправлял тебе расписание твоей группы, то укажи пожалуйста"
+                                                     " её название.\n <i>Пример: МК-22</i>",
+                                               parse_mode='html',
+                                               reply_markup=keyboards())
+            except:
+                pass
 
 
 async def schedule():
