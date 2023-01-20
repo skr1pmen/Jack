@@ -89,3 +89,7 @@ class Database:
     def zero_chat_id(self, i):
         with self.connection:
             return self.cursor.execute("SELECT `chat_id` FROM `users` WHERE `group` = 0").fetchall()[i]
+
+    def if_prem(self, group, i):
+        with self.connection:
+            return self.cursor.execute("SELECT `prem` FROM `users` WHERE `group` = ?", (group, )).fetchall()[i]
