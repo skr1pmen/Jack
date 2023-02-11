@@ -108,37 +108,6 @@ def keyboards():
 
 
 @dp.message_handler()
-async def ad():
-    markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton("Узнать больше", url="https://vk.cc/ckU1vw"))
-
-    text = "Хочешь поиграть в современные игры, но не тянет железо?\nТогда Geforce Now тебе поможет. Играй где угодно и" \
-           "на чём угодно.\n\n• Запускайте любую из более 800 доступных игр. Подключайте свою библиотеку Steam, Epic Games " \
-           "или запускайте любую из 80 бесплатных игр. Десятки игр добавляются каждую неделю!\n• Запускайте и сохраняйте " \
-           "игры в облаке! Освободите место на жестком диске.\n• Играйте здесь и сейчас — не ждите патчей и обновлений, " \
-           "запускайте игру практически мгновенно.\n• Играйте с фотореалистичной графикой — доступны все передовые " \
-           "технологии трассировки лучей NVIDIA RTX и DLSS 2.0.\n• Транслируйте видеозаписи игр друзьям: с GeForce NOW " \
-           "Highlights лучшие моменты вашей игры будут автоматически сохраняться на вашем устройстве"
-
-    for group in groups.group.values():
-        len = db.len_users_group(group)
-        i = 0
-        while i < len:
-            chats = str(db.get_chats(group, i))
-            chat = int(re.sub(r'[(,)]', '', chats))
-            prems = str(db.if_prem(group, i))
-            prem = int(re.sub(r'[(,)]', '', prems))
-            if bool(prem):
-                try:
-                    await bot.send_photo(chat,
-                                        photo='https://thumb.cloud.mail.ru/weblink/thumb/xw1/Pfjp/SA6ufZoUH/banner_350%D1%85200.png',
-                                        caption=text, parse_mode='html', reply_markup=markup)
-                except:
-                    pass
-            i += 1
-
-
-@dp.message_handler()
 async def user_text(msg: types.Message):
     try:
         if db.group_exists(msg.chat.id) == 0:
@@ -242,9 +211,40 @@ async def NewSchedule():
                 pass
 
 
+# @dp.message_handler()
+# async def ad():
+#     markup = InlineKeyboardMarkup()
+#     markup.add(InlineKeyboardButton("Узнать больше", url="https://vk.cc/ckU1vw"))
+#
+#     text = "Хочешь поиграть в современные игры, но не тянет железо?\nТогда Geforce Now тебе поможет. Играй где угодно и" \
+#            "на чём угодно.\n\n• Запускайте любую из более 800 доступных игр. Подключайте свою библиотеку Steam, Epic Games " \
+#            "или запускайте любую из 80 бесплатных игр. Десятки игр добавляются каждую неделю!\n• Запускайте и сохраняйте " \
+#            "игры в облаке! Освободите место на жестком диске.\n• Играйте здесь и сейчас — не ждите патчей и обновлений, " \
+#            "запускайте игру практически мгновенно.\n• Играйте с фотореалистичной графикой — доступны все передовые " \
+#            "технологии трассировки лучей NVIDIA RTX и DLSS 2.0.\n• Транслируйте видеозаписи игр друзьям: с GeForce NOW " \
+#            "Highlights лучшие моменты вашей игры будут автоматически сохраняться на вашем устройстве"
+#
+#     for group in groups.group.values():
+#         len = db.len_users_group(group)
+#         i = 0
+#         while i < len:
+#             chats = str(db.get_chats(group, i))
+#             chat = int(re.sub(r'[(,)]', '', chats))
+#             prems = str(db.if_prem(group, i))
+#             prem = int(re.sub(r'[(,)]', '', prems))
+#             if bool(prem) is False:
+#                 try:
+#                     await bot.send_photo(chat,
+#                                         photo='https://thumb.cloud.mail.ru/weblink/thumb/xw1/Pfjp/SA6ufZoUH/banner_350%D1%85200.png',
+#                                         caption=text, parse_mode='html', reply_markup=markup)
+#                 except:
+#                     pass
+#             i += 1
+
+
 async def schedule():
     aioschedule.every(15).minutes.do(NewSchedule)
-    aioschedule.every(2).days.at("08:00").do(ad)
+    # aioschedule.every().day.at(f"{random.randint(0,23)}:{random.randint(0,59)}").do(ad)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
