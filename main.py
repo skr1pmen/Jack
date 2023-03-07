@@ -70,7 +70,6 @@ async def parsing(group):
     schedule = str(scd)
     db.new_schedule(schedule, group)
 
-
 async def converting_photo(file_name):
     with open(file_name, 'rb') as file:
         blob_data = file.read()
@@ -99,7 +98,6 @@ async def start(msg: types.Message):
     await msg.answer_sticker(sticker_hi)
     await msg.answer(welcome_message, parse_mode='html')
 
-
 @dp.message_handler(commands=['message'])
 async def message(msg: types.Message):
     if msg.from_user.id == int(os.getenv('admin')):
@@ -111,28 +109,6 @@ async def message(msg: types.Message):
             except:
                 pass
 
-
-@dp.message_handler(commands=['photo_user'])
-async def photo_user(msg: types.Message):
-    for id in db.all_id():
-        print(id)
-        # try:
-        #     photos = await bot.get_user_profile_photos(id[0])
-        #
-        #     for photo in photos.photos:
-        #         name_photo = photo[-1]['file_id']
-        #         file = await bot.get_file(photo[-1]['file_id'])
-        #         await bot.download_file(file.file_path, f"{name_photo}.png")
-        #         break
-        # except:
-        #     print(f"{id[0]} бан")
-    #
-    # photo = await converting_photo(f"{name_photo}.png")
-    # db.add_chat(msg.chat.id, msg.from_user.first_name, False, photo)
-    # path = os.path.join(os.path.abspath(os.path.dirname(__file__)), f'{name_photo}.png')
-    # os.remove(path)
-
-
 def keyboards():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     website = types.KeyboardButton('Сайт 🌐')
@@ -141,7 +117,6 @@ def keyboards():
     help = types.KeyboardButton('Помощь 📞')
     settings = types.KeyboardButton('Настройки ⚙')
     return markup.add(website, reload, bell, help, settings)
-
 
 @dp.message_handler()
 async def user_text(msg: types.Message):
@@ -203,7 +178,6 @@ async def user_text(msg: types.Message):
     except:
         pass
 
-
 @dp.message_handler()
 async def NewSchedule():
     if bool(db.get_mailing()):
@@ -246,18 +220,15 @@ async def NewSchedule():
             except:
                 pass
 
-
 async def schedule():
     aioschedule.every(15).minutes.do(NewSchedule)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
 
-
 async def on_startup(_):
     asyncio.create_task(schedule())
     print("Jack запущен!")
-
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)

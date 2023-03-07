@@ -93,7 +93,3 @@ class Database:
     def if_prem(self, group, i):
         with self.connection:
             return self.cursor.execute("SELECT `prem` FROM `users` WHERE `group` = ?", (group, )).fetchall()[i]
-
-    def all_id(self):
-        with self.connection:
-            return self.cursor.execute("select `chat_id`, `id` from `users`").fetchall()
