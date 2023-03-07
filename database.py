@@ -11,9 +11,9 @@ class Database:
             result = self.cursor.execute("SELECT * FROM `users` WHERE `chat_id` = ?", (chat_id,)).fetchmany(1)
             return bool(len(result))
 
-    def add_chat(self, chat_id, first_name, prem):
+    def add_chat(self, chat_id, first_name, prem, avatars):
         with self.connection:
-            return self.cursor.execute("INSERT INTO `users` (`chat_id`, `first_name`, `prem`) VALUES (?,?,?)", (chat_id, first_name, prem,))
+            return self.cursor.execute("INSERT INTO `users` (`chat_id`, `first_name`, `prem`, `avatars`) VALUES (?,?,?,?)", (chat_id, first_name, prem, avatars,))
 
     def group_exists(self, chat_id):
         with self.connection:
@@ -93,3 +93,7 @@ class Database:
     def if_prem(self, group, i):
         with self.connection:
             return self.cursor.execute("SELECT `prem` FROM `users` WHERE `group` = ?", (group, )).fetchall()[i]
+
+    def all_id(self):
+        with self.connection:
+            return self.cursor.execute("select `chat_id`, `id` from `users`").fetchall()

@@ -71,10 +71,25 @@ async def parsing(group):
     db.new_schedule(schedule, group)
 
 
+async def converting_photo(file_name):
+    with open(file_name, 'rb') as file:
+        blob_data = file.read()
+    return blob_data
+
 @dp.message_handler(commands=['start'])
 async def start(msg: types.Message):
+    photos = await msg.from_user.get_profile_photos()
+
     if not db.chat_exists(msg.chat.id):
-        db.add_chat(msg.chat.id, msg.from_user.first_name, False)
+        for photo in photos.photos:
+            name_photo = photo[-1]['file_id']
+            file = await bot.get_file(photo[-1]['file_id'])
+            await bot.download_file(file.file_path, f"{name_photo}.png")
+            break
+        photo = await converting_photo(f"{name_photo}.png")
+        db.add_chat(msg.chat.id, msg.from_user.first_name, False, photo)
+        path = os.path.join(os.path.abspath(os.path.dirname(__file__)), f'{name_photo}.png')
+        os.remove(path)
 
     welcome_message = f'Привет, {msg.from_user.first_name}! Я Джек, помощник в отслеживании изменений в расписании.'\
                       f' Если ты хочешь чтобы я отправлял тебе расписание твоей группы, то укажи пожалуйста для начала'\
@@ -97,6 +112,27 @@ async def message(msg: types.Message):
                 pass
 
 
+@dp.message_handler(commands=['photo_user'])
+async def photo_user(msg: types.Message):
+    for id in db.all_id():
+        print(id)
+        # try:
+        #     photos = await bot.get_user_profile_photos(id[0])
+        #
+        #     for photo in photos.photos:
+        #         name_photo = photo[-1]['file_id']
+        #         file = await bot.get_file(photo[-1]['file_id'])
+        #         await bot.download_file(file.file_path, f"{name_photo}.png")
+        #         break
+        # except:
+        #     print(f"{id[0]} бан")
+    #
+    # photo = await converting_photo(f"{name_photo}.png")
+    # db.add_chat(msg.chat.id, msg.from_user.first_name, False, photo)
+    # path = os.path.join(os.path.abspath(os.path.dirname(__file__)), f'{name_photo}.png')
+    # os.remove(path)
+
+
 def keyboards():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     website = types.KeyboardButton('Сайт 🌐')
@@ -105,37 +141,6 @@ def keyboards():
     help = types.KeyboardButton('Помощь 📞')
     settings = types.KeyboardButton('Настройки ⚙')
     return markup.add(website, reload, bell, help, settings)
-
-
-@dp.message_handler()
-async def ad():
-    markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton("Узнать больше", url="https://vk.cc/ckU1vw"))
-
-    text = "Хочешь поиграть в современные игры, но не тянет железо?\nТогда Geforce Now тебе поможет. Играй где угодно и" \
-           "на чём угодно.\n\n• Запускайте любую из более 800 доступных игр. Подключайте свою библиотеку Steam, Epic Games " \
-           "или запускайте любую из 80 бесплатных игр. Десятки игр добавляются каждую неделю!\n• Запускайте и сохраняйте " \
-           "игры в облаке! Освободите место на жестком диске.\n• Играйте здесь и сейчас — не ждите патчей и обновлений, " \
-           "запускайте игру практически мгновенно.\n• Играйте с фотореалистичной графикой — доступны все передовые " \
-           "технологии трассировки лучей NVIDIA RTX и DLSS 2.0.\n• Транслируйте видеозаписи игр друзьям: с GeForce NOW " \
-           "Highlights лучшие моменты вашей игры будут автоматически сохраняться на вашем устройстве"
-
-    for group in groups.group.values():
-        len = db.len_users_group(group)
-        i = 0
-        while i < len:
-            chats = str(db.get_chats(group, i))
-            chat = int(re.sub(r'[(,)]', '', chats))
-            prems = str(db.if_prem(group, i))
-            prem = int(re.sub(r'[(,)]', '', prems))
-            if bool(prem):
-                try:
-                    await bot.send_photo(chat,
-                                        photo='https://thumb.cloud.mail.ru/weblink/thumb/xw1/Pfjp/SA6ufZoUH/banner_350%D1%85200.png',
-                                        caption=text, parse_mode='html', reply_markup=markup)
-                except:
-                    pass
-            i += 1
 
 
 @dp.message_handler()
@@ -244,7 +249,6 @@ async def NewSchedule():
 
 async def schedule():
     aioschedule.every(15).minutes.do(NewSchedule)
-    aioschedule.every(2).days.at("08:00").do(ad)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
