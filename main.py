@@ -37,9 +37,9 @@ async def parsing(group):
         with open("schedule.html", "w", encoding='utf-8') as file:
             file.write(src)
     except:
-        # print(f"Код: {group}. Не доступен!")
-        with open("schedule.html", "w", encoding='utf-8') as file:
-            file.write()
+        print(f"Код: {group}. Не доступен!")
+        # with open("schedule.html", "w", encoding='utf-8') as file:
+        #     file.write()
 
     with open("schedule.html", encoding='utf-8') as file:
         src = file.read()
@@ -77,15 +77,20 @@ async def converting_photo(file_name):
 
 @dp.message_handler(commands=['start'])
 async def start(msg: types.Message):
+    global name_photo
     photos = await msg.from_user.get_profile_photos()
 
     if not db.chat_exists(msg.chat.id):
-        for photo in photos.photos:
-            name_photo = photo[-1]['file_id']
-            file = await bot.get_file(photo[-1]['file_id'])
-            await bot.download_file(file.file_path, f"{name_photo}.png")
-            break
-        photo = await converting_photo(f"{name_photo}.png")
+        try:
+            for photo in photos.photos:
+                name_photo = photo[-1]['file_id']
+                file = await bot.get_file(photo[-1]['file_id'])
+                await bot.download_file(file.file_path, f"{name_photo}.png")
+                break
+            photo = await converting_photo(f"{name_photo}.png")
+        except:
+            photo = await converting_photo(f"avatar.png")
+
         db.add_chat(msg.chat.id, msg.from_user.first_name, False, photo)
         path = os.path.join(os.path.abspath(os.path.dirname(__file__)), f'{name_photo}.png')
         os.remove(path)

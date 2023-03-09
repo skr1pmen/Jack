@@ -13,7 +13,7 @@ class Database:
 
     def add_chat(self, chat_id, first_name, prem, avatars):
         with self.connection:
-            return self.cursor.execute("INSERT INTO `users` (`chat_id`, `first_name`, `prem`, `avatars`) VALUES (?,?,?,?)", (chat_id, first_name, prem, avatars,))
+            return self.cursor.execute("INSERT INTO `users` (`chat_id`, `first_name`, `prem`, `avatar`) VALUES (?,?,?,?)", (chat_id, first_name, prem, avatars,))
 
     def group_exists(self, chat_id):
         with self.connection:
